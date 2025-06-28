@@ -1,0 +1,148 @@
+/**
+	 * Tier 4
+	 */
+	public void generateDayTimeTier4Citadel(final Player player) {
+		player.lock();
+		GameEngine.get().slowExecutor().execute(new Runnable() {
+			@Override
+			public void run() {
+				boundChuncks = RegionBuilder.findEmptyChunkBound(16, 16);
+				RegionBuilder.copyAllPlanesMap(680, 544, boundChuncks[0],
+						boundChuncks[1], 16, 16);
+				player.setNextAnimation(new Animation(-1));
+				WorldTasksManager.schedule(new WorldTask() {
+					@Override
+					public void run() {
+						citadelGenerated = true;
+						player.getClanManager().getClan().getClanCitadel()
+								.teleportPlayerToCitadel(player);
+						player.unlock();
+					}
+
+				}, 1);
+			}
+		});
+	}
+
+	public void generateNightTimeTier4Citadel(final Player player) {
+		player.lock();
+		GameEngine.get().slowExecutor().execute(new Runnable() {
+			@Override
+			public void run() {
+				boundChuncks = RegionBuilder.findEmptyChunkBound(16, 16);
+				RegionBuilder.copyAllPlanesMap(696, 544, boundChuncks[0],
+						boundChuncks[1], 16, 16);
+				player.setNextAnimation(new Animation(-1));
+				WorldTasksManager.schedule(new WorldTask() {
+					@Override
+					public void run() {
+						citadelGenerated = true;
+						player.getClanManager().getClan().getClanCitadel()
+								.teleportPlayerToCitadel(player);
+						player.unlock();
+					}
+
+				}, 1);
+			}
+		});
+	}
+
+	/**
+	 * Tier 3
+	 */
+
+	public void generateDayTimeTier3Citadel(final Player player) {
+		player.lock();
+		GameEngine.get().slowExecutor().execute(new Runnable() {
+			@Override
+			public void run() {
+				boundChuncks = RegionBuilder.findEmptyChunkBound(16, 16);
+				RegionBuilder.copyAllPlanesMap(616, 608, boundChuncks[0],
+						boundChuncks[1], 16, 16);
+				player.setNextAnimation(new Animation(-1));
+				WorldTasksManager.schedule(new WorldTask() {
+					@Override
+					public void run() {
+						citadelGenerated = true;
+						player.getClanManager().getClan().getClanCitadel()
+								.teleportPlayerToCitadel(player);
+						player.unlock();
+					}
+
+				}, 1);
+			}
+		});
+	}
+
+	public void generateNightTimeTier3Citadel(final Player player) {
+		player.lock();
+		GameEngine.get().slowExecutor().execute(new Runnable() {
+			@Override
+			public void run() {
+				 RegionBuilder.findEmptyChunkBound(16, 16);
+				RegionBuilder.copyAllPlanesMap(632, 608, boundChuncks[0],
+						boundChuncks[1], 16, 16);
+				player.setNextAnimation(new Animation(-1));
+				WorldTasksManager.schedule(new WorldTask() {
+					@Override
+					public void run() {
+						citadelGenerated = true;
+						player.getClanManager().getClan().getClanCitadel()
+								.teleportPlayerToCitadel(player);
+						player.unlock();
+					}
+
+				}, 1);
+			}
+		});
+	}
+
+	/**
+	 * Tier 2
+	 */
+
+	public void generateDayTimeTier2Citadel(final Player player) {
+		player.lock();
+		GameEngine.get().slowExecutor().execute(new Runnable() {
+			@Override
+			public void run() {
+				boundChuncks = RegionBuilder.findEmptyChunkBound(16, 16);
+				RegionBuilder.copyAllPlanesMap(552, 608, boundChuncks[0],
+						boundChuncks[1], 16, 16);
+				player.setNextAnimation(new Animation(-1));
+				WorldTasksManager.schedule(new WorldTask() {
+					@Override
+					public void run() {
+						citadelGenerated = true;
+						player.getClanManager().getClan().getClanCitadel()
+								.teleportPlayerToCitadel(player);
+						player.unlock();
+					}
+
+				}, 1);
+			}
+		});
+	}
+
+	public void generateNightTimeTier2Citadel(final Player player) {
+		player.lock();
+		GameEngine.get().slowExecutor().execute(new Runnable() {
+			@Override
+			public void run() {
+				boundChuncks = RegionBuilder.findEmptyChunkBound(16, 16);
+				RegionBuilder.copyAllPlanesMap(568, 608, boundChuncks[0],
+						boundChuncks[1], 16, 16);
+				player.setNextAnimation(new Animation(-1));
+				WorldTasksManager.schedule(new WorldTask() {
+					@Override
+					public void run() {
+						citadelGenerated = true;
+						player.getClanManager().getClan().getClanCitadel()
+								.teleportPlayerToCitadel(player);
+						player.unlock();
+					}
+
+				}, 1);
+			}
+		});
+	}

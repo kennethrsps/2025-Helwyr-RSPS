@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.awt.Toolkit;
@@ -62,8 +61,6 @@ import com.rs.game.player.Player;
 import com.rs.game.player.Skills;
 import com.rs.game.player.SquealOfFortune;
 import com.rs.game.player.actions.automation.AutoSkillingManager;
-import com.rs.game.player.bot.Bot;
-import com.rs.game.player.bot.definition.BotDefinition;
 //import com.rs.game.player.combat.NPCCombatHPCommand;
 import com.rs.game.player.content.dropprediction.DropPrediction;
 import com.rs.game.player.content.dropprediction.DropUtils;
@@ -5541,7 +5538,6 @@ public final class Commands {
 					}
 				}
 				return true;
-			 
 			case "autoskill":
 			case "skilling":
 			    // Check if in skilling hub first
@@ -5589,32 +5585,6 @@ public final class Commands {
 					// player.setForceMultiArea(false);
 				}
 				Magic.sendNormalTeleportSpell(player, 0, 0, new WorldTile(1376, 5673, 0));
-				return true;
-			case "bots":
-				if (cmd.length > 3) {
-					BotDefinition[] types = BotDefinition.values();
-					final int count = Integer.parseInt(cmd[1]);
-					int type1 = Integer.parseInt(cmd[2]);
-					final int size = Integer.parseInt(cmd[3]);
-					final int playerX = player.getX();
-					final int playerY = player.getY();
-					Logger.log(Commands.class.getSimpleName(), "Spawning " + count + " bots");
-					final Random r = new Random();
-					for (int i = 0; i < count; i++) {
-						final int x = r.nextInt(size) - size / 2 + playerX;
-						final int y = r.nextInt(size) - size / 2 + playerY;
-						int usingType = type1;
-						if (type1 == -1) {
-							usingType = new Random().nextInt(types.length);
-						}
-						final BotDefinition definition = types[usingType];
-						final Bot bot = new Bot(definition.getName());
-						final WorldTile tile = new WorldTile(3037, 2978, 0);
-						bot.setDefinition(definition);
-						bot.setSpawnWorldTile(tile);
-						bot.setNextWorldTile(tile);
-					}
-				}
 				return true;
 			case "home":
 			case "respawn":

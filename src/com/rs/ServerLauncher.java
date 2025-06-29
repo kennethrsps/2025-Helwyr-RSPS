@@ -30,6 +30,7 @@ import com.rs.game.player.content.LividFarm;
 import com.rs.game.player.content.Lottery;
 import com.rs.game.player.content.WeeklyTopRanking;
 import com.rs.game.player.content.WellOfGoodWill;
+import com.rs.game.player.content.ancientthrone.ThroneManager;
 import com.rs.game.player.content.clans.ClansManager;
 import com.rs.game.player.content.grandExchange.GrandExchange;
 import com.rs.game.player.content.interfaces.arealoot.AreaLoot;
@@ -101,7 +102,7 @@ public final class ServerLauncher {
 		try {
 			Logger.log("Starting server initialization...");
 			initializeBackupServices();
-			//initializeDiscordServices();
+			initializeDiscordServices();
 			initializeCoreComponents();
 			initializePlayerData();
 			initializeBasicGameSystems();

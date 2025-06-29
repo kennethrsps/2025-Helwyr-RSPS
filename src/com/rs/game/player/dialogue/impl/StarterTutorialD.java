@@ -370,7 +370,7 @@ public class StarterTutorialD extends Dialogue {
 	/**
 	 * Completes tutorial - hands out rewards.
 	 */
-	public void completeTutorial() {
+	private void completeTutorial() {
 		player.getHintIconsManager().removeUnsavedHintIcon();
 		Dialogue.closeNoContinueDialogue(player);
 		player.setCompleted();

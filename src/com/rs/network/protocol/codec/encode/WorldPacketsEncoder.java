@@ -1610,27 +1610,4 @@ public class WorldPacketsEncoder extends Encoder {
 		session.write(stream);
 	}
 
-	public void sendItemsLook() {
-		OutputStream stream = new OutputStream(2);
-		stream.writePacket(player, 159);
-		session.write(stream);
-	}
-	public void sendLogout(boolean lobby) {
-		OutputStream stream = new OutputStream();
-		stream.writePacket(player, lobby ? 59 : 60);
-		ChannelFuture future = session.write(stream);
-		if (future != null) {
-			future.addListener(ChannelFutureListener.CLOSE);
-		} else {
-			session.getChannel().close();
-		}
-	}
-	public void sendSetMouse(String walkHereReplace, int cursor) {
-		OutputStream stream = new OutputStream();
-		stream.writePacketVarByte(player, 10);
-		stream.writeString(walkHereReplace);
-		stream.writeShort(cursor);
-		stream.endPacketVarByte();
-		session.write(stream);
-	}
 }

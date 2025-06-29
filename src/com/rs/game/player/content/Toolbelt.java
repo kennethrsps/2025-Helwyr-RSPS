@@ -69,25 +69,10 @@ public class Toolbelt implements Serializable {
 		return true;
 	}
 
-	public void forceInitialization() {
-	    if (items == null) {
-	        items = new HashMap<Integer, Boolean>();
-	        for (int itemId : TOOLBELT_ITEMS) {
-	            items.put(itemId, false);
-	        }
-	    }
-	}
-
-	// Also update the contains method to be safer:
 	public boolean contains(int itemId) {
-	    // Force initialization if items is null
-	    if (items == null) {
-	        forceInitialization();
-	    }
-	    
-	    if (items.get(itemId) == null)
-	        return false;
-	    return items.get(itemId);
+		if (items.get(itemId) == null)
+			return false;
+		return items.get(itemId);
 	}
 
 	public void setPlayer(Player player) {

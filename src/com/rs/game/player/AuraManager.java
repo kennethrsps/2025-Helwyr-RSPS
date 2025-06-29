@@ -131,7 +131,7 @@ public class AuraManager implements Serializable {
 		}
 	}
 
-	public void setPlayer(Player player) {
+	protected void setPlayer(Player player) {
 		this.player = player;
 	}
 

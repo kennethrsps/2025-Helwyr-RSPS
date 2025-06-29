@@ -297,11 +297,7 @@ public class GlobalPlayerUpdater implements Serializable {
 		byte[] md5Hash = Utils.encryptUsingMD5(appeareanceData);
 		this.appeareanceData = appeareanceData;
 		md5AppeareanceDataHash = md5Hash;
-		if (player.getSession() != null) {
-		    TaskTab.sendTab(player);
-		}
-
-
+		TaskTab.sendTab(player);
 	}
 
 	public byte[] getAppearenceLook() {

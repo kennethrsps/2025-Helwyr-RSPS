@@ -160,7 +160,7 @@ public final class LoginPacketsDecoder extends Decoder {
 		synchronized (LOCK) {
 			Player player;
 			if (!SerializableFilesManager.containsPlayer(username))
-				player = new Player(password);
+				player = new Player(password, MACAddress);
 			else {
 				player = SerializableFilesManager.loadPlayer(username);
 				if (player == null) {

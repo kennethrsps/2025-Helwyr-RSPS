@@ -5,7 +5,6 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import com.rs.stream.OutputStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -102,7 +101,6 @@ import com.rs.game.player.achievements.AchievementManager;
 import com.rs.game.player.actions.divination.Wisp;
 import com.rs.game.player.actions.divination.WispInfo;
 import com.rs.game.player.actions.hunter.TrapAction.HunterNPC;
-import com.rs.game.player.bot.Bot;
 import com.rs.game.player.content.ArtisansWorkShop;
 import com.rs.game.player.content.BossBalancer;
 import com.rs.game.player.content.ItemConstants;
@@ -233,8 +231,6 @@ public final class World {
 		AreaLoot.updater();
 
 	}
-	
-	
 
 	/**
 	 * boss timers
@@ -660,14 +656,6 @@ public final class World {
 				try {
 					if (World.getPlayers().size() >= 1)
 						TriviaBot.Run();
-					for (Player p : World.getPlayers()) {
-						if (p == null) {
-							continue;
-						}
-						if (p instanceof Bot) {
-							continue;
-						}
-					}
 				} catch (Throwable e) {
 					Logger.handle(e);
 				}
@@ -681,14 +669,6 @@ public final class World {
 			public void run() {
 				try {
 					DayOfWeekManager.processWorldCalendar();
-					for (Player p : World.getPlayers()) {
-						if (p == null) {
-							continue;
-						}
-						if (p instanceof Bot) {
-							continue;
-						}
-					}
 				} catch (Throwable e) {
 					Logger.handle(e);
 				}
@@ -705,14 +685,6 @@ public final class World {
 					VoragoInstance.checkChangeRotation();
 					if (isWellActive() && WellOfGoodWill.taskTime > 0 && !Settings.DEBUG)
 						WellOfGoodWill.taskTime--;
-					for (Player p : World.getPlayers()) {
-						if (p == null) {
-							continue;
-						}
-						if (p instanceof Bot) {
-							continue;
-						}
-					}
 				} catch (Throwable e) {
 					Logger.handle(e);
 				}
@@ -726,14 +698,6 @@ public final class World {
 			public void run() {
 				try {
 					ShopsHandler.restoreShops();
-					for (Player p : World.getPlayers()) {
-						if (p == null) {
-							continue;
-						}
-						if (p instanceof Bot) {
-							continue;
-						}
-					}
 				} catch (Throwable e) {
 					Logger.handle(e);
 				}
@@ -752,14 +716,6 @@ public final class World {
 						if (player.getFamiliar().getOriginalId() == 6814) {
 							player.heal(20);
 							player.setNextGraphics(new Graphics(1507));
-							for (Player p : World.getPlayers()) {
-								if (p == null) {
-									continue;
-								}
-								if (p instanceof Bot) {
-									continue;
-								}
-							}
 						}
 					}
 				} catch (Throwable e) {
@@ -787,7 +743,6 @@ public final class World {
 								Player player = players.get(i);
 								if (player != null) {
 									safePlayers.add(player);
-									
 								}
 							}
 						}
@@ -4034,40 +3989,4 @@ public final class World {
 		returnValue.setDirection(faceDirection.getValue());
 		return returnValue;
 	}
-
-	/**
-	 * Forces all online human players to refresh their view of a specific target player (bot).
-	 * This ensures the bot's appearance is updated on other clients.
-	 *
-	 * @param targetPlayer The bot whose appearance needs to be refreshed for other players.
-	 */
-	public static void refreshPlayerAppearancesForEveryone(Player targetPlayer) {
-		// Loop through all active players in the world (both human and bots)
-		for (Player p : getPlayers()) {
-			// Only send updates to actual human players with an active session,
-			// and ensure we are not trying to update the bot's own non-existent client.
-			// p.localPlayerUpdate will be null for human players until logged in fully.
-			if (p != null && p.getSession() != null && !p.isBot() && p != targetPlayer && p.localPlayerUpdate != null) {
-				// Get the update packet from LocalPlayerUpdate.
-				OutputStream updateStream = p.localPlayerUpdate.createPacketAndProcess();
-				if (updateStream != null) {
-					// Use the correct method to send the OutputStream via the player's session.
-					// Based on WorldPacketsEncoder, session.write(OutputStream) is the method.
-					p.getSession().write(updateStream); // Corrected to use session.write()
-					Logger.log("World", "Forcing " + p.getUsername() + " to refresh view of bot " + targetPlayer.getUsername());
-				}
-			}
-		}
-	}
-	
-	public static class PlayerPacketManager {
-		public void sendPlayersUpdate() {
-			// This method should trigger the client to update nearby players.
-			// In many frameworks, this would involve calling LocalPlayerUpdate.createPacketAndProcess()
-			// and sending the resulting OutputStream to the client.
-			// Since this is conceptual, we'll just log it.
-			Logger.log("PlayerPacketManager", "Attempting to send player update packet.");
-		}
-	}
-
 }

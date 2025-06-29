@@ -8,7 +8,6 @@ import com.rs.game.World;
 import com.rs.game.player.Player;
 import com.rs.stream.OutputStream;
 import com.rs.utils.Utils;
-import com.rs.utils.Logger; // Added Logger import for debugging
 
 public final class LocalPlayerUpdate {
 
@@ -18,7 +17,7 @@ public final class LocalPlayerUpdate {
 	 */
 	private static final int MAX_PLAYER_ADD = 15;
 
-	private Player player; // This is the player whose client this update system belongs to.
+	private Player player;
 
 	private byte[] slotFlags;
 
@@ -31,7 +30,7 @@ public final class LocalPlayerUpdate {
 
 	private int[] regionHashes;
 
-	public byte[][] cachedAppearencesHashes;
+	private byte[][] cachedAppearencesHashes;
 	private int totalRenderDataSentLength;
 
 	/**
@@ -67,57 +66,28 @@ public final class LocalPlayerUpdate {
 		for (int playerIndex = 1; playerIndex < 2048; playerIndex++) {
 			if (playerIndex == player.getIndex())
 				continue;
-			Player p = World.getPlayers().get(playerIndex); // Renamed to p for consistency with needsAdd/Remove
-			stream.writeBits(18, regionHashes[playerIndex] = p == null ? 0 : p.getRegionHash());
+			Player player = World.getPlayers().get(playerIndex);
+			stream.writeBits(18, regionHashes[playerIndex] = player == null ? 0 : player.getRegionHash());
 			outPlayersIndexes[outPlayersIndexesCount++] = playerIndex;
 
 		}
 		stream.finishBitAccess();
 	}
 
-	/**
-	 * Determines if a player (p) should be removed from the current player's (this.player) local list.
-	 *
-	 * IMPORTANT FIX: Bots should now be visible to human players.
-	 * This logic prevents a bot from removing itself or other players from its *own* local list
-	 * (as bots don't have clients to render them).
-	 * For human players, bots are now treated like normal players for removal checks (distance, finished status).
-	 */
 	private boolean needsRemove(Player p) {
-		// If the observing player (this.player) is a bot, it should not process other players for rendering.
-		// So, from a bot's perspective, all other entities are "removed" for its (non-existent) client.
-		if (player.isBot()) {
-			return true;
-		}
-
-		// If the observing player (this.player) is a human:
-		// A human player needs to remove entities that are null, finished, or out of viewing distance.
-		// Bots (p.isBot()) are now included in the rendering process for human players,
-		// so we do NOT return true just because 'p' is a bot.
-		return (p == null || p.hasFinished() || !player.withinDistance(p, player.hasLargeSceneView() ? 126 : 14));
+		 if (p == null || p.isBot()) {
+		        return true; // Remove bots from local player updates
+		    }
+		return (p.hasFinished() || !player.withinDistance(p, player.hasLargeSceneView() ? 126 : 14));
 	}
 
-	/**
-	 * Determines if a player (p) should be added to the current player's (this.player) local list.
-	 *
-	 * IMPORTANT FIX: Bots should now be visible to human players.
-	 * This logic prevents a bot from adding other players to its *own* local list.
-	 * For human players, bots are now treated like normal players for addition checks (distance, not finished).
-	 */
 	private boolean needsAdd(Player p) {
-		// If the observing player (this.player) is a bot, it should not add other players.
-		if (player.isBot()) {
-			return false;
-		}
-
-		// If the observing player (this.player) is a human:
-		// A human player needs to add entities that are valid players, not finished, and within distance.
-		// Bots (p.isBot()) are now included in the rendering process for human players,
-		// so we do NOT return false just because 'p' is a bot.
+		 if (p == null || p.isBot()) {
+		        return false; // Don't add bots to local player updates
+		    }
 		return p != null && !p.hasFinished() && player.withinDistance(p, player.hasLargeSceneView() ? 126 : 14)
 				&& localAddedPlayers < MAX_PLAYER_ADD;
 	}
-
 
 	private void updateRegionHash(OutputStream stream, int lastRegionHash, int currentRegionHash) {
 		int lastRegionX = lastRegionHash >> 8;

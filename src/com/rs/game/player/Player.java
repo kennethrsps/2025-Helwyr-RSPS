@@ -13,10 +13,8 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
-import com.rs.network.Session; // Often needed for PlayerPackets constructor
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,7 +38,6 @@ import com.rs.game.Hit.HitLook;
 import com.rs.game.Projectile;
 import com.rs.game.Region;
 import com.rs.game.World;
-import com.rs.game.World.PlayerPacketManager;
 import com.rs.game.WorldObject;
 import com.rs.game.WorldTile;
 import com.rs.game.activites.BountyHunter;
@@ -71,7 +68,6 @@ import com.rs.game.player.actions.Fishing;
 import com.rs.game.player.actions.Fishing.FishingSpots;
 import com.rs.game.player.actions.divination.DivineObject;
 import com.rs.game.player.actions.mining.Mining.RockDefinitions;
-import com.rs.game.player.bot.Bot;
 import com.rs.game.player.combat.PlayerCombat;
 import com.rs.game.player.content.BossBalancer;
 import com.rs.game.player.content.BossTimerManager;
@@ -158,7 +154,6 @@ import com.rs.game.topweeks.TopWeeklyDonates;
 import com.rs.network.Session;
 import com.rs.network.protocol.codec.decode.WorldPacketsDecoder;
 import com.rs.network.protocol.codec.decode.impl.ButtonHandler;
-import com.rs.network.protocol.codec.encode.BotWorldPacketsEncoder;
 import com.rs.network.protocol.codec.encode.WorldPacketsEncoder;
 import com.rs.utils.Colors;
 import com.rs.utils.DonationRank;
@@ -166,7 +161,6 @@ import com.rs.utils.Donations;
 import com.rs.utils.IsaacKeyPair;
 import com.rs.utils.Lend;
 import com.rs.utils.Logger;
-import com.rs.utils.MachineInformation;
 import com.rs.utils.PkRank;
 import com.rs.utils.SerializableFilesManager;
 import com.rs.utils.Utils;
@@ -186,34 +180,8 @@ public class Player extends Entity {
 	public int npcSotapanaDmg;
 	public static boolean isMainhand = false;
 	private double autoSkillingStartXP = 0.0;
-
-	public double getAutoSkillingStartXP() {
-		return autoSkillingStartXP;
-	}
-
-	public void setAutoSkillingStartXP(double xp) {
-		this.autoSkillingStartXP = xp;
-	}
-
-	public boolean isBot() {
-		return isBot; // CHANGE THIS FROM 'return false;'
-	}
-
-	public void setBot(boolean isBot) {
-		this.isBot = isBot;
-	}
-
-	public boolean isPlayer() {
-	    return !isBot(); // Returns true if it's NOT a bot, implying it's a human player
-	}
-	// NEW METHOD: Added to provide a render distance for player updates
-    public int getRenderDistance() {
-        // You can adjust these values based on your client's actual view distance
-        // 14 is a common default for standard view, 126 for large scene view
-        return hasLargeSceneView() ? 126 : 14;
-    }
-    
-
+	public double getAutoSkillingStartXP() { return autoSkillingStartXP; }
+	public void setAutoSkillingStartXP(double xp) { this.autoSkillingStartXP = xp; }
 
 	public transient ActionManager actionManager = new ActionManager(this);
 
@@ -405,7 +373,7 @@ public class Player extends Entity {
 	private boolean allowChatEffects;
 	private GlobalPlayerUpdater globalPlayerUpdater;
 	public AuraManager auraManager = new AuraManager();
-	public Bank bank;
+	private Bank bank;
 	private int barrowsKillCount;
 	private int barrowsRunsDone;
 	private transient long boneDelay;
@@ -445,13 +413,13 @@ public class Player extends Entity {
 	public transient boolean clientLoadedMapRegion;
 
 	private transient Runnable closeInterfacesEvent;
-	public CombatDefinitions combatDefinitions;
+	private CombatDefinitions combatDefinitions;
 	// completionistcape reqs
 	private boolean completedFightCaves;
 	private boolean completedFightKiln;
 	private boolean completedRfd;
 	private int[] completionistCapeCustomized;
-	public ControlerManager controlerManager;
+	private ControlerManager controlerManager;
 	private long creationDate;
 	private int crucibleHighScore;
 	private boolean culinaromancer;
@@ -471,7 +439,7 @@ public class Player extends Entity {
 	private boolean donator;
 	private long donatorTill;
 	private DuelArena duelarena;
-	public EmotesManager emotesManager;
+	private EmotesManager emotesManager;
 	public TreasureTrails treasureTrails;
 	public BountyHunter bountHunter;
 	public Equipment equipment;
@@ -488,7 +456,7 @@ public class Player extends Entity {
 	private transient long foodDelay;
 	private boolean forceNextMapLoadRefresh;
 	private int friendChatSetup;
-	public FriendsIgnores friendsIgnores;
+	private FriendsIgnores friendsIgnores;
 	private int hiddenBrother;
 
 	private boolean hideWorldAnnouncements;
@@ -497,7 +465,7 @@ public class Player extends Entity {
 	private transient double hpBoostMultiplier;
 	private boolean inAnimationRoom;
 	public transient InterfaceManager interfaceManager = new InterfaceManager(this);
-	public Inventory inventory;
+	private Inventory inventory;
 	private transient boolean invulnerable;
 	public transient IsaacKeyPair isaacKeyPair;
 	private boolean isInDefenderRoom;
@@ -534,7 +502,7 @@ public class Player extends Entity {
 	private int[] maxedCapeCustomized;
 	public int money;
 	private boolean mouseButtons;
-	public MusicsManager musicsManager;
+	private MusicsManager musicsManager;
 
 	public Notes notesL;
 
@@ -633,7 +601,7 @@ public class Player extends Entity {
 	}
 
 	// reaper
-	public ContractHandler cHandler;
+	private ContractHandler cHandler;
 	private Contract cContracts;
 
 	private int temporaryMovementType;
@@ -686,178 +654,19 @@ public class Player extends Entity {
 	private long petLastPreventedDeath;
 	private long petLastHealCd;
 
-	private boolean logedIn;
-
 	/**
 	 * @return
 	 */
 	public boolean hasXmasTitleUnlocked() {
 		return (xmasTitle1 || xmasTitle2 || xmasTitle3 || xmasTitle4);
 	}
-	
-	// Add this method to your Player.java class (the complete safe version)
-
-	public void fullyInitializeForBot() {
-	    try {
-	        System.out.println("Starting bot initialization for: " + getUsername());
-	        
-	        // Initializes core variables from the Entity class
-	        initEntity(); 
-	        
-	        // --- Initialize all Player-specific managers with error handling ---
-	        try {
-	            packets = new BotWorldPacketsEncoder(this);
-	        } catch (Exception e) {
-	            System.err.println("Error initializing packets encoder: " + e.getMessage());
-	        }
-	        
-	        try {
-	            actionManager = new ActionManager(this);
-	            dialogueManager = new DialogueManager(this);
-	            cutscenesManager = new CutscenesManager(this);
-	            interfaceManager = new InterfaceManager(this);
-	            hintIconsManager = new HintIconsManager(this);
-	            priceCheckManager = new PriceCheckManager(this);
-	            localPlayerUpdate = new LocalPlayerUpdate(this);
-	            localNPCUpdate = new LocalNPCUpdate(this);
-	            pouch = new MoneyPouch(this);
-	            charges = new ChargesManager();
-	            auraManager = new AuraManager();
-	            questManager = new QuestManager();
-	            petManager = new PetManager();
-	            notesL = new Notes();
-	            skills = new Skills();
-	            inventory = new Inventory();
-	            equipment = new Equipment();
-	            bank = new Bank();
-	            prayer = new Prayer();
-	            combatDefinitions = new CombatDefinitions();
-	            friendsIgnores = new FriendsIgnores();
-	            musicsManager = new MusicsManager();
-	            emotesManager = new EmotesManager();
-	            dominionTower = new DominionTower();
-	            house = new House();
-	            controlerManager = new ControlerManager();
-	            geManager = new GrandExchangeManager();
-	            slayerManager = new SlayerManager();
-	            farmingManager = new FarmingManager();
-	        } catch (Exception e) {
-	            System.err.println("Error initializing basic managers: " + e.getMessage());
-	        }
-	        
-	        // CRITICAL: Initialize toolbelts safely - these cause the NPE
-	        try {
-	            // Don't initialize toolbelts for bots - they use the safe override
-	            toolBelt = null; // Will be handled by getToolBelt() override
-	            toolBeltNew = null; // Will be handled safely
-	        } catch (Exception e) {
-	            System.err.println("Toolbelt initialization skipped for bot");
-	        }
-	        
-	        try {
-	            dungManager = new DungManager();
-	            dayOfWeekManager = new DayOfWeekManager();
-	            dailyTaskManager = new DailyTaskManager();
-	            banksManager = new BanksManager();
-	            newQuestManager = new NewQuestManager();
-	            gearPresets = new GearPresets();
-	            bountyHunter = new BountyHunter();
-	            elderTreeManager = new ElderTreeManager();
-	            cHandler = new ContractHandler();
-	            squealOfFortune = new SquealOfFortune();
-	            coOpSlayer = new CooperativeSlayer();
-	            treasureTrails = new TreasureTrails();
-	            ports = new PlayerOwnedPort();
-	            xmas = new XmasEvent();
-	            petLootManager = new PetLootManager();
-	            perkManager = new PerkManager();
-	            membership = new MembershipHandler();
-	            titles = new Titles();
-	            throne = new ThroneOfMiscellania();
-	            setDeathManager(new DeathManager());
-	            setBossTimerManager(new BossTimerManager(this));
-	            setAchManager(new AchievementManager(this));
-	            setGrManager(new GRManager(this));
-	            setResourceGather(new ResourceGatherBuff(this));
-	            setLoginManager(new DailyLoginManager());
-	            setPotionTimers(new PotionTimers(this));
-	            setGlobalPlayerUpdater(new GlobalPlayerUpdater());
-	        } catch (Exception e) {
-	            System.err.println("Error initializing advanced managers: " + e.getMessage());
-	        }
-
-	        // --- Link all managers back to the player object with error handling ---
-	        try {
-	            if (getGlobalPlayerUpdater() != null) getGlobalPlayerUpdater().setPlayer(this);
-	            if (getInventory() != null) getInventory().setPlayer(this);
-	            if (getEquipment() != null) getEquipment().setPlayer(this);
-	            if (getSkills() != null) getSkills().setPlayer(this);
-	            if (getCombatDefinitions() != null) getCombatDefinitions().setPlayer(this);
-	            if (getPrayer() != null) getPrayer().setPlayer(this);
-	            if (getBank() != null) getBank().setPlayer(this);
-	            if (getControlerManager() != null) getControlerManager().setPlayer(this);
-	            if (getMusicsManager() != null) getMusicsManager().setPlayer(this);
-	            if (getEmotesManager() != null) getEmotesManager().setPlayer(this);
-	            if (getFriendsIgnores() != null) getFriendsIgnores().setPlayer(this);
-	            if (getDominionTower() != null) getDominionTower().setPlayer(this);
-	            if (getAuraManager() != null) getAuraManager().setPlayer(this);
-	            if (getQuestManager() != null) getQuestManager().setPlayer(this);
-	            if (getPetManager() != null) getPetManager().setPlayer(this);
-	            if (getCharges() != null) getCharges().setPlayer(this);
-	            if (getFarmingManager() != null) getFarmingManager().setPlayer(this);
-	            if (getDayOfWeekManager() != null) getDayOfWeekManager().setPlayer(this);
-	            if (getDailyTaskManager() != null) getDailyTaskManager().setPlayer(this);
-	            if (getSquealOfFortune() != null) getSquealOfFortune().setPlayer(this);
-	            if (getNotes() != null) getNotes().setPlayer(this);
-	            if (getDeathManager() != null) getDeathManager().setPlayer(this);
-	            if (getBountyHunter() != null) getBountyHunter().setPlayer(this);
-	            if (getThrone() != null) getThrone().setPlayer(this);
-	            
-	            // SKIP toolbelt linking - handled by override
-	            
-	            if (getDungManager() != null) getDungManager().setPlayer(this);
-	            if (getHouse() != null) getHouse().setPlayer(this);
-	            if (getGearPresets() != null) getGearPresets().setPlayer(this);
-	            if (getBanksManager() != null) getBanksManager().setPlayer(this);
-	            if (getSlayerManager() != null) getSlayerManager().setPlayer(this);
-	            if (getPetLootManager() != null) getPetLootManager().setPlayer(this);
-	            if (getElderTreeManager() != null) getElderTreeManager().setPlayer(this);
-	            if (getTitles() != null) getTitles().setPlayer(this);
-	            if (getNewQuestManager() != null) getNewQuestManager().setPlayer(this);
-	            if (getOverrides() != null) getOverrides().setPlayer(this);
-	            if (getAnimations() != null) getAnimations().setPlayer(this);
-	            if (getGEManager() != null) getGEManager().setPlayer(this);
-	            if (getPorts() != null) getPorts().setPlayer(this);
-	            if (getXmas() != null) getXmas().setPlayer(this);
-	            if (getTreasureTrails() != null) getTreasureTrails().setPlayer(this);
-	            if (getPerkManager() != null) getPerkManager().setPlayer(this);
-	        } catch (Exception e) {
-	            System.err.println("Error linking managers: " + e.getMessage());
-	        }
-
-	        // --- Set default states ---
-	        try {
-	            setDirection(Utils.getFaceDirection(0, -1));
-	            setTemporaryMoveType(-1);
-	            logicPackets = new ConcurrentLinkedQueue<LogicPacket>();
-	            setSwitchItemCache(Collections.synchronizedList(new ArrayList<Integer>()));
-	        } catch (Exception e) {
-	            System.err.println("Error setting default states: " + e.getMessage());
-	        }
-	        
-	        System.out.println("Bot " + getUsername() + " fully initialized successfully");
-	        
-	    } catch (Exception e) {
-	        System.err.println("CRITICAL error in fullyInitializeForBot: " + e.getMessage());
-	        e.printStackTrace();
-	    }
-	}
 
 	// creates Player and saved classes
-	public Player(String password) {
+	public Player(String password, String mac) {
 		super(Settings.START_PLAYER_LOCATION);
 		setHitpoints(Settings.START_PLAYER_HITPOINTS);
 		this.password = password;
+		registeredMac = mac;
 		setGlobalPlayerUpdater(new GlobalPlayerUpdater());
 		inventory = new Inventory();
 		dungManager = new DungManager();
@@ -924,18 +733,6 @@ public class Player extends Entity {
 		ownedObjectsManagerKeys = new LinkedList<String>();
 		setCreationDate(Utils.currentTimeMillis());
 		currentFriendChatOwner = "Zeus";
-		this.isBot = false;
-        this.hasCompleted = false; // Default for normal players
-        this.logedIn = false;
-	}
-	 public boolean isLogedIn() {
-	        return logedIn;
-	    }
-
-	   
-
-	public Player() {
-		this("bot_password");
 	}
 
 	public void addFoodDelay(long time) {
@@ -1556,25 +1353,10 @@ public class Player extends Entity {
 		return ownedObjectsManagerKeys;
 	}
 
-	// In Player.java, replace the getPackets() method with this
-
-	// This is the correct version for Player.java
-
-	// In Player.java, this is the final, correct version.
-
 	public WorldPacketsEncoder getPackets() {
-		// For real players with a live connection, get packets from the session.
-		if (session != null) {
-			return session.getWorldPackets();
-		}
-		// For bots (who have no session), get packets from the variable we created for them.
-		return packets;
+		return session.getWorldPackets();
 	}
-	public void initIsaacKeyPair() {
-		// Creates a simple, non-random key pair. The numbers don't matter for the bot.
-		isaacKeyPair = new IsaacKeyPair(new int[] { 0, 0, 0, 0 });
-	}
-	
+
 	public long getPacketsDecoderPing() {
 		return packetsDecoderPing;
 	}
@@ -2763,7 +2545,7 @@ public class Player extends Entity {
 				return;
 			}
 		}
-		AutoSkillingManager.handlePlayerLogout(this);
+		 AutoSkillingManager.handlePlayerLogout(this);
 		CombatMastery.onPlayerLogout(this);
 		getPackets().sendLogout();
 		setRunning(false);
@@ -3160,9 +2942,7 @@ public class Player extends Entity {
 		setTotalPlayTime(getTotalPlayTime() + (getRecordedPlayTime() - Utils.currentTimeMillis()));
 		setTimePlayedWeekly(getTimePlayedWeekly());
 		setFinished(true);
-		if (!(this instanceof Bot)) {
-			session.setDecoder(-1);
-		}
+		session.setDecoder(-1);
 		SerializableFilesManager.savePlayer(this);
 		World.updateEntityRegion(this);
 		World.removePlayer(this);
@@ -3758,7 +3538,6 @@ public class Player extends Entity {
 			else
 				inventory.addItem(item.getId(), item.getAmount());
 		}
-		
 		World.addGroundItem(new Item(526, 1), deathTile,
 				killer == null ? this : (killer.isIronMan() || killer.isHCIronMan()) ? this : killer, true, 60);
 		if (items[1].length != 0) {
@@ -4406,9 +4185,7 @@ public class Player extends Entity {
 		LoginManager.sendLogin(this);
 		if (isDead() || getHitpoints() <= 0)
 			sendDeath(null);
-		hasCompleted();
 		setActive(true);
-		
 	}
 
 	public void stopAll() {
@@ -4743,10 +4520,6 @@ public class Player extends Entity {
 	public void setCompleted() {
 		getHintIconsManager().removeUnsavedHintIcon();
 		this.hasCompleted = true;
-	}
-
-	public void setHasCompleted(boolean hasCompleted) {
-		this.hasCompleted = hasCompleted;
 	}
 
 	public boolean hasCompleted() {
@@ -7953,8 +7726,6 @@ public class Player extends Entity {
 
 	private transient boolean pouchFilter;
 
-	private WorldPacketsEncoder packets;
-
 	public void setPouchFilter(boolean pouchFilter) {
 		this.pouchFilter = pouchFilter;
 	}
@@ -7972,10 +7743,6 @@ public class Player extends Entity {
 	public boolean canMove(int dir) {
 		return true;
 	}
-	public void setPackets(com.rs.network.protocol.codec.encode.WorldPacketsEncoder packets) {
-	    this.packets = packets;
-	}
-	
 
 	/**
 	 * Membership.
@@ -9438,8 +9205,15 @@ public class Player extends Entity {
 
 	public int arealootFilterMode = 0;
 
-	private boolean isBot = false;
+	public boolean isBot() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
+	public boolean isPlayer() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 	public void enhancedHeal(int amount, int extraHP) {
 		try {
@@ -9488,33 +9262,33 @@ public class Player extends Entity {
 
 	// Auto-thieving stall management
 	public int getAutoThievingStall() {
-		return autoThievingStall;
+	    return autoThievingStall;
 	}
 
 	public void setAutoThievingStall(int stall) {
-		this.autoThievingStall = stall;
+	    this.autoThievingStall = stall;
 	}
 
 	// Auto-thieving mode management (AUTO vs SPECIFIC)
 	public String getAutoThievingMode() {
-		// Ensure mode is never null, default to AUTO
-		if (autoThievingMode == null || autoThievingMode.isEmpty()) {
-			autoThievingMode = "AUTO";
-		}
-		return autoThievingMode;
+	    // Ensure mode is never null, default to AUTO
+	    if (autoThievingMode == null || autoThievingMode.isEmpty()) {
+	        autoThievingMode = "AUTO";
+	    }
+	    return autoThievingMode;
 	}
 
 	public void setAutoThievingMode(String mode) {
-		this.autoThievingMode = mode;
+	    this.autoThievingMode = mode;
 	}
 
 	// Rogue encounter setting
 	public boolean isStopOnRogue() {
-		return stopOnRogue;
+	    return stopOnRogue;
 	}
 
 	public void setStopOnRogue(boolean stopOnRogue) {
-		this.stopOnRogue = stopOnRogue;
+	    this.stopOnRogue = stopOnRogue;
 	}
 
 	// Add these fields to your Player class:
@@ -9600,186 +9374,36 @@ public class Player extends Entity {
 	public void setAutoWoodcuttingMode(String mode) {
 		this.autoWoodcuttingMode = mode;
 	}
-
-	// Mining mode and rock selection
+	// Mining mode and rock selection  
 	private String autoMiningMode; // "AUTO" or "SPECIFIC"
 	private RockDefinitions autoMiningRock; // Target rock type
 
 	// Getters and setters
-	public String getAutoMiningMode() {
-		return autoMiningMode;
-	}
-
-	public void setAutoMiningMode(String mode) {
-		this.autoMiningMode = mode;
-	}
-
-	public RockDefinitions getAutoMiningRock() {
-		return autoMiningRock;
-	}
-
-	public void setAutoMiningRock(RockDefinitions rock) {
-		this.autoMiningRock = rock;
-	}
-
+	public String getAutoMiningMode() { return autoMiningMode; }
+	public void setAutoMiningMode(String mode) { this.autoMiningMode = mode; }
+	public RockDefinitions getAutoMiningRock() { return autoMiningRock; }
+	public void setAutoMiningRock(RockDefinitions rock) { this.autoMiningRock = rock; }
+	
+	
 	private String autoFishingMode = "AUTO";
 	private Fishing.FishingSpots autoFishingSpot = null;
 
 	public String getAutoFishingMode() {
-		return autoFishingMode;
+	    return autoFishingMode;
 	}
 
 	public void setAutoFishingMode(String mode) {
-		this.autoFishingMode = mode;
+	    this.autoFishingMode = mode;
 	}
 
 	public Fishing.FishingSpots getAutoFishingSpot() {
-		return autoFishingSpot;
+	    return autoFishingSpot;
 	}
 
 	public void setAutoFishingSpot(Fishing.FishingSpots spot) {
-		this.autoFishingSpot = spot;
+	    this.autoFishingSpot = spot;
 	}
-
-	public void init(Session session, String string, IsaacKeyPair isaacKeyPair) {
-		username = string;
-		this.session = session;
-		this.isaacKeyPair = isaacKeyPair;
-		World.addPlayer(this);// .addLobbyPlayer(this);
-		if (Settings.DEBUG) {
-			Logger.log(this, new StringBuilder("Lobby Inited Player: ").append(string).append(", pass: ").append(password).toString());
-		}
-	}
-	public void init(Session session, String username, int displayMode, int screenWidth, int screenHeight, MachineInformation machineInformation, IsaacKeyPair isaacKeyPair) {
-		
-		if (dominionTower == null) {
-			dominionTower = new DominionTower();
-		}
-		if (farmingManager == null) {
-			farmingManager = new FarmingManager();
-		}
-		if (auraManager == null) {
-			auraManager = new AuraManager();
-		}
-		
-		
-		if (house == null) {
-			house = new House();
-		}
-		
-		if (squealOfFortune == null) {
-			squealOfFortune = new SquealOfFortune();
-		}
-		// if (RoomConstruction == null)
-		// RoomConstruction = new RoomConstruction(this);
-		if (questManager == null) {
-			questManager = new QuestManager();
-		}
-		
-
-//		}
-		this.session = session;
-		this.username = username;
-		this.displayMode = displayMode;
 	
-		this.isaacKeyPair = isaacKeyPair;
-
-		
-		interfaceManager = new InterfaceManager(this);
-		loyaltyManager = new LoyaltyManager(this);
-		
-		
-		squealOfFortune.setPlayer(this);
-
 	
-		getLoyaltyManager().startTimer();
-		dungManager = new DungManager();
-        dayOfWeekManager = new DayOfWeekManager();
-        dailyTaskManager = new DailyTaskManager();
-        banksManager = new BanksManager();
-        newQuestManager = new NewQuestManager();
-        gearPresets = new GearPresets();
-        bountyHunter = new BountyHunter();
-        elderTreeManager = new ElderTreeManager();
-        cHandler = new ContractHandler();
-        squealOfFortune = new SquealOfFortune();
-        coOpSlayer = new CooperativeSlayer();
-        treasureTrails = new TreasureTrails();
-        ports = new PlayerOwnedPort();
-        xmas = new XmasEvent();
-        petLootManager = new PetLootManager();
-        perkManager = new PerkManager();
-        membership = new MembershipHandler();
-        titles = new Titles();
-        throne = new ThroneOfMiscellania();
-        setDeathManager(new DeathManager());
-        setBossTimerManager(new BossTimerManager(this));
-        setAchManager(new AchievementManager(this));
-        setGrManager(new GRManager(this));
-        setResourceGather(new ResourceGatherBuff(this));
-        setLoginManager(new DailyLoginManager());
-        setPotionTimers(new PotionTimers(this));
-        setGlobalPlayerUpdater(new GlobalPlayerUpdater());
-		
-		dialogueManager = new DialogueManager(this);
-		hintIconsManager = new HintIconsManager(this);
-		/**
-		 * yell colours
-		 */
-
-		String yellcolor = "" + getYellColor() + "";
-		String yellshad = "" + getYellColor() + "";
-		setYellColor(yellcolor);
-		setYellColor(yellshad);
-		
-		priceCheckManager = new PriceCheckManager(this);
-	
-		localPlayerUpdate = new LocalPlayerUpdate(this);
-		localNPCUpdate = new LocalNPCUpdate(this);
-		actionManager = new ActionManager(this);
-		cutscenesManager = new CutscenesManager(this);
-		trade = new Trade(this);
-		// loads player on saved instances
-		
-		// customGear.setPlayer(this);
-		inventory.setPlayer(this);
-		equipment.setPlayer(this);
-		
-		// toolbelt.setPlayer(this);
-		
-		skills.setPlayer(this);
-		combatDefinitions.setPlayer(this);
-		prayer.setPlayer(this);
-		bank.setPlayer(this);
-		
-		controlerManager.setPlayer(this);
-		gearPresets.setPlayer(this);
-		farmingManager.setPlayer(this);
-		musicsManager.setPlayer(this);
-		emotesManager.setPlayer(this);
-		friendsIgnores.setPlayer(this);
-		dominionTower.setPlayer(this);
-		auraManager.setPlayer(this);
-		charges.setPlayer(this);
-		questManager.setPlayer(this);
-		petManager.setPlayer(this);
-		DivineObject.resetGatherLimit(this);
-		house.setPlayer(this);
-		setDirection(Utils.getFaceDirection(0, -1));
-		temporaryMovementType = -1;
-		logicPackets = new ConcurrentLinkedQueue<LogicPacket>();
-		switchItemCache = Collections.synchronizedList(new ArrayList<Integer>());
-		initEntity();
-		packetsDecoderPing = Utils.currentTimeMillis();
-		World.addPlayer(this);
-		
-		
-		World.updateEntityRegion(this);
-		
-		if (Settings.DEBUG) {
-			Logger.log(this, "Initiated player: " + username + ", pass: " + password);
-		}
-
-	}
 
 }

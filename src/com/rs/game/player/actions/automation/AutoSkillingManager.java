@@ -420,7 +420,7 @@ public class AutoSkillingManager {
     /**
      * Get the appropriate handler for the skill
      */
-    public static SkillHandler getHandler(SkillingType skill) {
+    private static SkillHandler getHandler(SkillingType skill) {
         switch (skill) {
             case WOODCUTTING:
                 return AutoWoodcuttingHandler.getInstance();
@@ -557,7 +557,7 @@ public class AutoSkillingManager {
     /**
      * FIXED: This now uses intelligent pathfinding.
      */
-    public static void startBankingSequence(Player player) {
+    private static void startBankingSequence(Player player) {
         WorldObject targetBank = findClosestBank(player);
         if (targetBank == null) {
             player.sendMessage("No bank found in the area! Stopping auto-skilling.");
@@ -691,7 +691,7 @@ public class AutoSkillingManager {
         return player.withinDistance(new WorldTile(bank.getX(), bank.getY(), bank.getPlane()), 3);
     }
     
-    public static boolean isAtBank(Player player) {
+    private static boolean isAtBank(Player player) {
         WorldObject nearbyBank = findClosestBank(player);
         return nearbyBank != null && isAtBank(player, nearbyBank);
     }
@@ -946,12 +946,5 @@ public class AutoSkillingManager {
             }
             return sb.toString();
         } catch (Exception e) { return "error"; }
-    }
-    public static void walkToSkillingHubCenter(Player player) {
-        if (!player.hasWalkSteps()) {
-            if (!player.calcFollow(SKILLING_HUB_CENTER, true)) {
-                player.sendMessage(Colors.red + "Could not find a path back to the skilling area.");
-            }
-        }
     }
 }

@@ -17,7 +17,6 @@ import com.rs.game.player.achievements.AchievementManager;
 import com.rs.game.player.actions.ActionManager;
 import com.rs.game.player.actions.automation.AutoSkillingManager;
 import com.rs.game.player.actions.automation.AutoSkillingManager.AutoSkillingState; // Import AutoSkillingState
-import com.rs.game.player.bot.Bot;
 import com.rs.game.player.content.BossTimerManager;
 import com.rs.game.player.content.CombatMastery;
 import com.rs.game.player.content.FriendChatsManager;
@@ -72,15 +71,15 @@ public class LoginManager {
 	/**
 	 * Inits the login; from LoginPacketsDecoder.
 	 *
-	 * @param player           The player to login.
-	 * @param session          The current Session data.
-	 * @param username         The players username.
-	 * @param mac              The players MACAddress.
-	 * @param displayMode      The players display mode.
-	 * @param screenWidth      The player clients screen width.
-	 * @param screenHeight     The player clients screen height.
+	 * @param player             The player to login.
+	 * @param session            The current Session data.
+	 * @param username           The players username.
+	 * @param mac                The players MACAddress.
+	 * @param displayMode        The players display mode.
+	 * @param screenWidth        The player clients screen width.
+	 * @param screenHeight       The player clients screen height.
 	 * @param machineInformation The players computer information.
-	 * @param isaacKeyPair     The players unique isaac key.
+	 * @param isaacKeyPair       The players unique isaac key.
 	 */
 	public static void init(Player player, Session session, String username, String mac, int displayMode,
 			IsaacKeyPair isaacKeyPair) {
@@ -245,7 +244,7 @@ public class LoginManager {
 		player.getXmas().setPlayer(player);
 		player.getFriendsIgnores().setPlayer(player);
 		player.getDominionTower().setPlayer(player);
-		player.getAuraManager().setPlayer(player); // This should be player, not bot
+		player.getAuraManager().setPlayer(player);
 		player.getTreasureTrails().setPlayer(player);
 		player.getPerkManager().setPlayer(player);
 		player.getNotes().setPlayer(player);
@@ -443,27 +442,8 @@ public class LoginManager {
 		if (Settings.DEBUG)
 			player.sendMessage("Server is currently in development mode!");
 		// player.setRights(2);
-
-		// NEW: Add a check for isBot() to explicitly bypass tutorial for bots
-		if (!player.hasCompleted() && !player.isBot() ) {
-			for (Player p : World.getPlayers()) {
-				if (p == null) {
-					continue;
-				}
-				if (p instanceof Bot) {
-					continue;
-				}
-			}
+		if (!player.hasCompleted())
 			StarterTutorialD.teleport(player);
-		} else if (player.isBot()) {
-		    // If it's a bot and it has completed (or we're bypassing), ensure it's unlocked
-		    // and potentially moved to the correct starting location if it wasn't already.
-		    player.unlock();
-		    // You might also want to explicitly move the bot here if it was somehow
-		    // mispositioned or if there's a specific bot starting area.
-		    // Example: player.setNextWorldTile(new WorldTile(1375, 5669, 0));
-		}
-
 
 		Gravestone.login(player);
 

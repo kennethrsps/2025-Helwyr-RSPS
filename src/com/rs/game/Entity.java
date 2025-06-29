@@ -986,7 +986,7 @@ public abstract class Entity extends WorldTile {
 		return nextWalkDirection;
 	}
 
-	protected Object[] getNextWalkStep() {
+	private Object[] getNextWalkStep() {
 		Object[] step = walkSteps.poll();
 		if (step == null)
 			return null;

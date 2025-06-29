@@ -17,6 +17,7 @@ import com.rs.game.player.achievements.AchievementManager;
 import com.rs.game.player.actions.ActionManager;
 import com.rs.game.player.actions.automation.AutoSkillingManager;
 import com.rs.game.player.actions.automation.AutoSkillingManager.AutoSkillingState; // Import AutoSkillingState
+import com.rs.game.player.bot.Bot;
 import com.rs.game.player.content.BossTimerManager;
 import com.rs.game.player.content.CombatMastery;
 import com.rs.game.player.content.FriendChatsManager;
@@ -444,7 +445,15 @@ public class LoginManager {
 		// player.setRights(2);
 
 		// NEW: Add a check for isBot() to explicitly bypass tutorial for bots
-		if (!player.hasCompleted() && !player.isBot()) {
+		if (!player.hasCompleted() && !player.isBot() ) {
+			for (Player p : World.getPlayers()) {
+				if (p == null) {
+					continue;
+				}
+				if (p instanceof Bot) {
+					continue;
+				}
+			}
 			StarterTutorialD.teleport(player);
 		} else if (player.isBot()) {
 		    // If it's a bot and it has completed (or we're bypassing), ensure it's unlocked

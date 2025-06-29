@@ -18,38 +18,51 @@ public final class WorldThread extends Thread {
 	}
 
 	@Override
-    public final void run() {
-        while (!CoresManager.shutdown) {
-            WORLD_CYCLE++;
-            long currentTime = Utils.currentTimeMillis();
+	public final void run() {
+		while (!CoresManager.shutdown) {
+			WORLD_CYCLE++; // made the cycle update at begin instead of end cuz
+							// at end theres 600ms then to next cycle
+			long currentTime = Utils.currentTimeMillis();
+			// long debug = Utils.currentTimeMillis();
 
-            try {
-                WorldTasksManager.processTasks();
-            } catch (Throwable e) {
-                Logger.handle(e);
-            }
+			try {
+				WorldTasksManager.processTasks();
+			} catch (Throwable e) {
+				Logger.handle(e);
+			}
 
-            try {
-                for (Player player : World.getPlayers()) {
-                    // --- ADD THESE DEBUG LINES ---
-                    if (player.isBot()) {
-                        System.out.println("DEBUG (WorldThread): Found bot: " + player.getUsername() +
-                                           " Active: " + player.isActive() +
-                                           " Finished: " + player.hasFinished());
-                    }
-                    // --- END DEBUG LINES ---
+			// CLEAN BOT SYSTEM: Process bot logic (before player processing)
 
-                    if (player == null || !player.isActive() || player.hasFinished()) {
-                        if (player.isBot()) { // Log why bot is skipped
-                            System.out.println("DEBUG (WorldThread): Skipping bot " + player.getUsername() +
-                                               " because isActive=" + player.isActive() +
-                                               ", hasFinished=" + player.hasFinished());
-                        }
-                        continue;
-                    }
-                    player.processEntity(); // This should call BotPlayer.processEntity()
-                }
-                for (NPC npc : World.getNPCs()) {
+			try {
+				for (Player player : World.getPlayers()) {
+					if (player == null || !player.isActive() || player.hasFinished())
+						continue;
+
+					// CLEAN BOT INTEGRATION: Safe processing for bots
+					else {
+						player.processEntity();
+					}
+				}
+				for (NPC npc : World.getNPCs()) {
+					if (npc == null || npc.hasFinished())
+						continue;
+					npc.processEntity();
+				}
+			} catch (Throwable e) {
+				Logger.handle(e);
+			}
+
+			try {
+				for (Player player : World.getPlayers()) {
+					if (player == null || !player.isActive() || player.hasFinished())
+						continue;
+
+					// CLEAN BOT INTEGRATION: Safe entity update for bots
+					else {
+						player.processEntityUpdate();
+					}
+				}
+				for (NPC npc : World.getNPCs()) {
 					if (npc == null || npc.hasFinished())
 						continue;
 					npc.processEntityUpdate();
@@ -57,7 +70,6 @@ public final class WorldThread extends Thread {
 			} catch (Throwable e) {
 				Logger.handle(e);
 			}
-            // --- FIX END ---
 
 			try {
 				// //
@@ -68,7 +80,7 @@ public final class WorldThread extends Thread {
 					if (player == null || !player.isActive() || player.hasFinished())
 						continue;
 
-					// CLEAN BOT INTEGRATION: Skip packet sending for bots (this is correct)
+					// CLEAN BOT INTEGRATION: Skip packet sending for bots
 					if (!player.isBot()) {
 						player.getPackets().sendLocalPlayersUpdate();
 						player.getPackets().sendLocalNPCsUpdate();
@@ -88,8 +100,10 @@ public final class WorldThread extends Thread {
 					if (player == null || !player.isActive() || player.hasFinished())
 						continue;
 
-					// CLEAN BOT INTEGRATION: Mask reset should happen for all
-					player.resetMasks();
+					// CLEAN BOT INTEGRATION: Safe mask reset for bots
+					else {
+						player.resetMasks();
+					}
 				}
 				for (NPC npc : World.getNPCs()) {
 					if (npc == null || npc.hasFinished())

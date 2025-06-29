@@ -31,7 +31,7 @@ public final class LocalPlayerUpdate {
 
 	private int[] regionHashes;
 
-	private byte[][] cachedAppearencesHashes;
+	public byte[][] cachedAppearencesHashes;
 	private int totalRenderDataSentLength;
 
 	/**

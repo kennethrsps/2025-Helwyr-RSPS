@@ -94,7 +94,6 @@ import com.rs.game.npc.telos.Telos;
 import com.rs.game.npc.veraklith.VerakLith;
 import com.rs.game.npc.xmas.AsteaFrostweb;
 import com.rs.game.npc.xmas.SmallSnowman;
-import com.rs.game.player.BotPlayer;
 import com.rs.game.player.DayOfWeekManager;
 import com.rs.game.player.MembershipHandler;
 import com.rs.game.player.Player;
@@ -103,6 +102,7 @@ import com.rs.game.player.achievements.AchievementManager;
 import com.rs.game.player.actions.divination.Wisp;
 import com.rs.game.player.actions.divination.WispInfo;
 import com.rs.game.player.actions.hunter.TrapAction.HunterNPC;
+import com.rs.game.player.bot.Bot;
 import com.rs.game.player.content.ArtisansWorkShop;
 import com.rs.game.player.content.BossBalancer;
 import com.rs.game.player.content.ItemConstants;
@@ -216,7 +216,6 @@ public final class World {
 		ZOManager.init();
 		AchievementManager.init();
 		tickSkillingEvents();
-		 BotManager.process();
 		
 
 		if (TimedBosses == null) {
@@ -234,6 +233,8 @@ public final class World {
 		AreaLoot.updater();
 
 	}
+	
+	
 
 	/**
 	 * boss timers
@@ -659,6 +660,14 @@ public final class World {
 				try {
 					if (World.getPlayers().size() >= 1)
 						TriviaBot.Run();
+					for (Player p : World.getPlayers()) {
+						if (p == null) {
+							continue;
+						}
+						if (p instanceof Bot) {
+							continue;
+						}
+					}
 				} catch (Throwable e) {
 					Logger.handle(e);
 				}
@@ -672,6 +681,14 @@ public final class World {
 			public void run() {
 				try {
 					DayOfWeekManager.processWorldCalendar();
+					for (Player p : World.getPlayers()) {
+						if (p == null) {
+							continue;
+						}
+						if (p instanceof Bot) {
+							continue;
+						}
+					}
 				} catch (Throwable e) {
 					Logger.handle(e);
 				}
@@ -688,6 +705,14 @@ public final class World {
 					VoragoInstance.checkChangeRotation();
 					if (isWellActive() && WellOfGoodWill.taskTime > 0 && !Settings.DEBUG)
 						WellOfGoodWill.taskTime--;
+					for (Player p : World.getPlayers()) {
+						if (p == null) {
+							continue;
+						}
+						if (p instanceof Bot) {
+							continue;
+						}
+					}
 				} catch (Throwable e) {
 					Logger.handle(e);
 				}
@@ -701,6 +726,14 @@ public final class World {
 			public void run() {
 				try {
 					ShopsHandler.restoreShops();
+					for (Player p : World.getPlayers()) {
+						if (p == null) {
+							continue;
+						}
+						if (p instanceof Bot) {
+							continue;
+						}
+					}
 				} catch (Throwable e) {
 					Logger.handle(e);
 				}
@@ -719,6 +752,14 @@ public final class World {
 						if (player.getFamiliar().getOriginalId() == 6814) {
 							player.heal(20);
 							player.setNextGraphics(new Graphics(1507));
+							for (Player p : World.getPlayers()) {
+								if (p == null) {
+									continue;
+								}
+								if (p instanceof Bot) {
+									continue;
+								}
+							}
 						}
 					}
 				} catch (Throwable e) {
@@ -746,6 +787,7 @@ public final class World {
 								Player player = players.get(i);
 								if (player != null) {
 									safePlayers.add(player);
+									
 								}
 							}
 						}

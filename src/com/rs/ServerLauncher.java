@@ -13,7 +13,6 @@ import com.rs.cache.loaders.ItemsEquipIds;
 import com.rs.cache.loaders.NPCDefinitions;
 import com.rs.cache.loaders.ObjectDefinitions;
 import com.rs.cores.CoresManager;
-import com.rs.game.BotManager;
 import com.rs.game.MapBuilder;
 import com.rs.game.World;
 import com.rs.game.map.bossInstance.BossInstanceHandler;
@@ -31,7 +30,6 @@ import com.rs.game.player.content.LividFarm;
 import com.rs.game.player.content.Lottery;
 import com.rs.game.player.content.WeeklyTopRanking;
 import com.rs.game.player.content.WellOfGoodWill;
-import com.rs.game.player.content.ancientthrone.ThroneManager;
 import com.rs.game.player.content.clans.ClansManager;
 import com.rs.game.player.content.grandExchange.GrandExchange;
 import com.rs.game.player.content.interfaces.arealoot.AreaLoot;
@@ -103,7 +101,7 @@ public final class ServerLauncher {
 		try {
 			Logger.log("Starting server initialization...");
 			initializeBackupServices();
-			initializeDiscordServices();
+			//initializeDiscordServices();
 			initializeCoreComponents();
 			initializePlayerData();
 			initializeBasicGameSystems();
@@ -185,7 +183,6 @@ public final class ServerLauncher {
 		DonationRank.init();
 		VoteHiscores.init();
 		AreaLoot.startUpdaterDelayed();
-		 BotManager.init();
 		//startWebServer();
 	}
 
